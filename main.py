@@ -1,5 +1,6 @@
 """
-    Generating cryptocurrecy keys that are post-quantum resistant using Dilithium, which is a signature scheme provided by the OQS library
+    Generating cryptocurrecy keys that are post-quantum resistant using Dilithium, which is a signature scheme provided by the OQS library.
+    Dilithium2 is a Lattice-based encryption scheme.
 """
 
 
