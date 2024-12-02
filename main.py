@@ -3,11 +3,12 @@
     Dilithium2 is a Lattice-based encryption scheme.
 """
 
-
 import oqs
 import binascii
 import hashlib
 import base58
+import time
+import json
 
 # The signature algorithm
 sigalg = 'Dilithium2'
@@ -23,8 +24,8 @@ with oqs.Signature(sigalg) as signer:
     public_key_hex = binascii.hexlify(public_key).decode()
     private_key_hex = binascii.hexlify(private_key).decode()
 
-print("Public key in hex:", public_key_hex)
-print("Private key in hex:", private_key_hex)
+print("\nPublic key in hex:", public_key_hex)
+print("\nPrivate key in hex:", private_key_hex)
 
 # Deriving the wallet address by hashing the public key using SHA-256 and then using RIPEMD-160 -> Simulating BitCoin addresses
 sha256_hash = hashlib.sha256(public_key).digest()
@@ -33,4 +34,30 @@ ripemd160_hash = hashlib.new('ripemd160', sha256_hash).digest()
 # Encoding the result of the hashing using Basse58 like BitCoin
 wallet_address = base58.b58encode(ripemd160_hash).decode()
 
-print("Generated Wallet Address:", wallet_address)
+print("\nGenerated Wallet Address:", wallet_address)
+
+# Consider a sample BitCoin transaction
+transaction = {
+    'sender': wallet_address,
+    'recipient': '3AgbInc1sL9hnHavv5IOcjuRFQEU', # Dummy recipient's public address
+    'amount': 2,
+    'transaction_id': 'aaa_001',
+    'timestamp': int(time.time())
+}
+
+transaction_message = json.dumps(transaction).encode()
+
+# Signing the transaction with the private key
+with oqs.Signature(sigalg, private_key) as signer:
+    signature = signer.sign(transaction_message)
+
+print("\nSignature in hex:", signature.hex())
+
+# Verifying the signature using the public key
+with oqs.Signature(sigalg) as verifier:
+    is_verified = verifier.verify(transaction_message, signature, public_key)
+
+if is_verified:
+    print("\nTransaction valid since signature valid")
+else:
+    print("\nTransaction invalid")
