@@ -47,17 +47,20 @@ transaction = {
 
 transaction_message = json.dumps(transaction).encode()
 
+# Hashing the transaction message
+transaction_message_hash = hashlib.sha256(transaction_message).digest()
+
 # Signing the transaction with the private key
 with oqs.Signature(sigalg, private_key) as signer:
-    signature = signer.sign(transaction_message)
+    signature = signer.sign(transaction_message_hash)
 
 print("\nSignature in hex:", signature.hex())
 
 # Verifying the signature using the public key
 with oqs.Signature(sigalg) as verifier:
-    is_verified = verifier.verify(transaction_message, signature, public_key)
+    is_verified = verifier.verify(transaction_message_hash, signature, public_key)
 
 if is_verified:
-    print("\nTransaction valid since signature valid")
+    print("\nTransaction valid since the signature is valid")
 else:
     print("\nTransaction invalid")
