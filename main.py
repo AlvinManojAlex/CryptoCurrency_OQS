@@ -9,6 +9,7 @@ import hashlib
 import base58
 import time
 import json
+import oqs.rand as oqsrand
 
 # The signature algorithm
 sigalg = 'Dilithium2'
@@ -36,8 +37,14 @@ wallet_address = base58.b58encode(ripemd160_hash).decode()
 
 print("\nGenerated Wallet Address:", wallet_address)
 
+# Generating a nonce value that is randomly generated using OQS random bytes
+nonce = oqsrand.randombytes(8)
+nonce_hex = binascii.hexlify(nonce).decode()
+print("\nRandomly generated nonce value:", nonce_hex)
+
 # Consider a sample BitCoin transaction
 transaction = {
+    'nonce': nonce_hex,
     'sender': wallet_address,
     'recipient': '3AgbInc1sL9hnHavv5IOcjuRFQEU', # Dummy recipient's public address
     'amount': 2,
@@ -45,7 +52,7 @@ transaction = {
     'timestamp': int(time.time())
 }
 
-transaction_message = json.dumps(transaction).encode()
+transaction_message = json.dumps(transaction, separators=(',', ':')).encode()
 
 # Hashing the transaction message
 transaction_message_hash = hashlib.sha256(transaction_message).digest()
